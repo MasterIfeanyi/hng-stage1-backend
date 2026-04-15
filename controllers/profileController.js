@@ -1,6 +1,6 @@
 const Profile = require('../models/Profile');
-const { consultAllOracles } = require('../oracles');
-const { classifyAgeGroup } = require('../utils');
+const { consultAllOracles, classifyAgeGroup } = require('../utils/fn');
+
 
 const createProfile = async (req, res) => {
   try {
@@ -14,11 +14,12 @@ const createProfile = async (req, res) => {
     }
     
     const trimmedName = name.trim();
-    
+
+    // if there is already a profile with the same name, return it
     const existingProfile = await Profile.findOne({ 
       name: { $regex: new RegExp(`^${trimmedName}$`, 'i') } 
     });
-    
+
     if (existingProfile) {
       return res.status(201).json({
         status: 'success',
@@ -37,7 +38,8 @@ const createProfile = async (req, res) => {
         }
       });
     }
-    
+
+    // if there is no profile with the same name, create a new one
     let oracleData;
     try {
       oracleData = await consultAllOracles(trimmedName);
