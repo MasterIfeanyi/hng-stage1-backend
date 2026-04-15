@@ -1,7 +1,10 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { connectDB } = require('./config/database');
+const { connectDB, Profile } = require('./config/database');
+const { v4: uuidv4 } = require('uuid');
+const { consultAllOracles, classifyAgeGroup } = require('./utils/fn');
+
 
 const app = express();
 const PORT = process.env.PORT || 8000;
