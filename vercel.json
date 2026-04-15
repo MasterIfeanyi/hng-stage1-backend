@@ -3,14 +3,14 @@
   "name": "hng-backend",
   "builds": [
     {
-      "src": "src/index.js",
+      "src": "./index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/index.js"
+      "dest": "./index.js"
     }
   ]
 }
