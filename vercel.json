@@ -1,9 +1,14 @@
 {
   "version": 2,
-  "rewrites": [
+  "functions": {
+    "index.js": {
+      "maxDuration": 10
+    }
+  },
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.js"
+      "src": "/(.*)",
+      "dest": "/index.js"
     }
   ]
 }
