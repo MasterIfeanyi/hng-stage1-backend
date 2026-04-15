@@ -6,6 +6,8 @@ const profileRoutes = require('./routes/profileRoutes');
 
 const app = express();
 
+const PORT = process.env.PORT || 8000;
+
 // 3. Set up CORS (allow all origins for now)
 app.use(cors({
   origin: '*'
