@@ -31,3 +31,5 @@ app.use('/api/profiles', profileRoutes);
 app.listen(PORT, () => {
   console.log(`Tower is alive at http://localhost:${PORT}`);
 });
+
+module.exports = app;
