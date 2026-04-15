@@ -1,10 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { connectDB, Profile } = require('./config/database');
+const { connectDB } = require('./config/database');
 const { v4: uuidv4 } = require('uuid');
-const { consultAllOracles, classifyAgeGroup } = require('./utils/fn');
-
+const profileRoutes = require('./routes/profileRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -26,7 +25,11 @@ app.get('/', (req, res) => {
   });
 });
 
+app.use('/api/profiles', profileRoutes);
+
 // 5. Open the gates!
 app.listen(PORT, () => {
   console.log(`Tower is alive at http://localhost:${PORT}`);
 });
+
+module.exports = app;

@@ -1,6 +1,6 @@
 const Profile = require('../models/Profile');
-const { consultAllOracles } = require('../oracles');
-const { classifyAgeGroup } = require('../utils');
+const { consultAllOracles, classifyAgeGroup } = require('../utils/fn');
+
 
 const createProfile = async (req, res) => {
   try {
@@ -14,11 +14,12 @@ const createProfile = async (req, res) => {
     }
     
     const trimmedName = name.trim();
-    
+
+    // if there is already a profile with the same name, return it
     const existingProfile = await Profile.findOne({ 
       name: { $regex: new RegExp(`^${trimmedName}$`, 'i') } 
     });
-    
+
     if (existingProfile) {
       return res.status(201).json({
         status: 'success',
@@ -37,7 +38,8 @@ const createProfile = async (req, res) => {
         }
       });
     }
-    
+
+    // if there is no profile with the same name, create a new one
     let oracleData;
     try {
       oracleData = await consultAllOracles(trimmedName);
@@ -87,6 +89,123 @@ const createProfile = async (req, res) => {
   }
 };
 
+
+
+
+const getProfileById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const profile = await Profile.findById(id);
+    
+    if (!profile) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Profile not found'
+      });
+    }
+    
+    res.status(200).json({
+      status: 'success',
+      data: {
+        id: profile._id,
+        name: profile.name,
+        gender: profile.gender,
+        gender_probability: profile.gender_probability,
+        sample_size: profile.sample_size,
+        age: profile.age,
+        age_group: profile.age_group,
+        country_id: profile.country_id,
+        country_probability: profile.country_probability,
+        created_at: profile.created_at.toISOString()
+      }
+    });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error'
+    });
+  }
+};
+
+
+const getAllProfiles = async (req, res) => {
+  try {
+    const { gender, country_id, age_group } = req.query;
+    
+    const filter = {};
+    
+    if (gender) {
+      filter.gender = { $regex: new RegExp(`^${gender}$`, 'i') };
+    }
+    
+    if (country_id) {
+      filter.country_id = { $regex: new RegExp(`^${country_id}$`, 'i') };
+    }
+    
+    if (age_group) {
+      filter.age_group = { $regex: new RegExp(`^${age_group}$`, 'i') };
+    }
+    
+    const profiles = await Profile.find(filter).sort({ created_at: -1 });
+    
+    const formattedProfiles = profiles.map(profile => ({
+      id: profile._id,
+      name: profile.name,
+      gender: profile.gender,
+      age: profile.age,
+      age_group: profile.age_group,
+      country_id: profile.country_id,
+      created_at: profile.created_at.toISOString()
+    }));
+    
+    res.status(200).json({
+      status: 'success',
+      count: formattedProfiles.length,
+      data: formattedProfiles
+    });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error'
+    });
+  }
+};
+
+
+const deleteProfileById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const profile = await Profile.findById(id);
+    
+    if (!profile) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Profile not found'
+      });
+    }
+    
+    await Profile.findByIdAndDelete(id);
+
+    res.status(204).send();
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error'
+    });
+  }
+};
+
 module.exports = {
-  createProfile
+  createProfile,
+  getProfileById,
+  getAllProfiles,
+  deleteProfileById
 };
