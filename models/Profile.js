@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const { v7: uuidv7 } = require('uuidv7');
+const { uuidv7 } = require('uuidv7');
 
 const profileSchema = new mongoose.Schema({
   _id: {
     type: String,
-    default: uuidv7
+    default: () => uuidv7()
   },
   name: {
     type: String,
